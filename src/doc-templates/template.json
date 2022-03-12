@@ -1,0 +1,245 @@
+{
+  "comment_pagesettings": {
+    "orientation": "portrait oder landscape",
+    "format": "a3, a4, a5, letter, legal",
+    "top, left, right, bottommargin": "die Seitenränder in mm",
+    "linespacing": "Zwischenraum zwischen Zeilen in mm",
+    "linktype": "frontend, backend oder keine",
+    "ausgabedatei": "Name der Ausgabedatei, wird sonst aus dem Namen der template-Datei abgeleitet"
+  },
+  "pagesettings": {
+    "orientation": "portrait",
+    "format": "A4",
+    "topmargin": 20,
+    "leftmargin": 30,
+    "rightmargin": 20,
+    "bottommargin": 20,
+    "linespacing": 1.5
+  },
+  "comment_fonts": {
+    "family": "z.B. arial, courier, times",
+    "preinstalled fonts": "helvetica[,B,BI,I], symbol, times[,B,BI,I], dingbats, all without €!",
+    "underlined fonts": "gibt es nicht, Striche werden vom Programm erzeugt",
+    "unicode fonts": "müssen explizit installiert werden, siehe unten den 'fonts'-Abschnitt",
+    "arialuc": "Arial Unicode, wird mit dem Programm mitgeliefert",
+    "family": "der Name, der im 'styles'-Abschnitt als 'font' benutzt wird",
+    "style": "leer für 'regulären' font, B für fetten(bold), I für kursiven(italic), BI für fett und kursiv, U unbenutzt!",
+    "file": "Pfad zur font-Datei (c:/.../irgendwas.ttf)",
+    "unicode": "true oder false, wenn false, können Sie auch die vorinstallierten fonts (s.o.) benutzen"
+  },
+  "fonts": [
+  ],
+  "comment_styles": {
+    "style": "B(old),U(nderline), I(talic), oder eine Kombination, z.B. BI, wenn fehlend oder leer, dann 'regulärer' font",
+    "size": "Fontgröße in points",
+    "type": "text, image oder link, wenn fehlend, dann text",
+    "color": "r,g,b values von 0 bis 255",
+    "dimen": "Größe breitexhöhe, in der das Bild gezeigt wird,  z.B. 60x30",
+    "body": "dieser Stil wird genommen, wenn nichts anderes bestimmt wird"
+  },
+  "styles": [
+    {
+      "name": "body",
+      "font": "arialuc",
+      "size": 10
+    },
+    {
+      "name": "Header1",
+      "font": "arialuc",
+      "style": "B",
+      "size": 25,
+      "comment": "ADFC blue",
+      "color": "15,74,124"
+    },
+    {
+      "name": "Header2",
+      "font": "arialuc",
+      "style": "B",
+      "size": 16
+    },
+    {
+      "name": "Header3",
+      "font": "arialuc",
+      "size": 14
+    },
+    {
+      "name": "Header4",
+      "font": "arialuc",
+      "style": "B",
+      "size": 14
+    },
+    {
+      "name": "Small",
+      "font": "ArialUC",
+      "size": 10
+    },
+    {
+      "name": "Tourtitel",
+      "font": "arialuc",
+      "size": 10,
+      "comment": "ADFC yellow",
+      "color": "238,126,13"
+    },
+    {
+      "name": "Link_yellow",
+      "type": "link",
+      "font": "arialuc",
+      "style": "",
+      "size": 10,
+      "comment": "ADFC yellow",
+      "color": "238,126,13"
+    },
+    {
+      "name": "Link_blue",
+      "type": "link",
+      "font": "arialuc",
+      "style": "",
+      "size": 10,
+      "comment": "blue",
+      "color": "2,2,255"
+    },
+    {
+      "name": "Logo",
+      "type": "image",
+      "dimen": "60x30"
+    }
+  ],
+  "header": {
+    "comment": "noch nicht implementiert"
+  },
+  "footer": {
+    "comment": "noch nicht implementiert"
+  },
+  "comment_selection": {
+    "includesub": "wenn true, durchsuche Gliederung und ihre Untergliederungen",
+    "gliederung": "Liste von Gliederungsnummern, durch Komma getrennt",
+    "start, end": "suche Touren und Termine innerhalb dieser Zeit (einschließlich des Ende-Datums)",
+    "titelenthält": "Tour/Termin wird ausgewählt, wenn der Titel einen dieser Werte enthält",
+    "titelenthältnicht": "Tour/Termin wird ausgewählt, wenn der Titel keinen dieser Werte enthält",
+    "radtyp": "Alles, Tourenrad, Rennrad, oder Mountainbike",
+    "tournr": "Tour/Termin wird ausgewählt, wenn die Nummer in der Liste vorkommt",
+    "nichttournr": "Tour/Termin wird ausgewählt, wenn die Nummer nicht in der Liste vorkommt",
+    "kategorie für Radtouren": "Tagestour, Halbtagestour, Feierabendtour, Mehrtagestour",
+    "kategorie für Termine": "Stammtisch, Öffentliche Arbeitsgruppe, Aktiventreff",
+    "Ergebnis der Selektion": "Die Bedingungen in der Selektion sind mit UND verknüpft, die Werte in der Liste mit ODER",
+    "Keine Bedingung angegeben": "Selektion ist erfüllt",
+    "Fehlende Werte": "werden ggfs. aus der UI übernommen"
+  },
+  "selection": {
+    "gliederung": "152059",
+    "includesub": true,
+    "start": "01.07.2017",
+    "end": "01.10.2017",
+    "terminselection": [
+      {
+        "name": "Technikkurse",
+        "titelenthält": [
+          "Bremsen",
+          "Kettenschaltung"
+        ]
+      },
+      {
+        "name": "Codierung",
+        "titelenthält": [
+          "Codierung"
+        ]
+      },
+      {
+        "name": "Treffen",
+        "titelenthält": [
+          "Stammtisch",
+          "Arbeitsgruppe"
+        ]
+      }
+    ],
+    "tourselection": [
+      {
+        "name": "Touren",
+        "comment tournr": [ 100, 101, 102 ],
+        "radtyp": [ "Alles" ]
+      }
+    ]
+  },
+  "text": [
+    "/Header1 Medieninformation /right /Logo ADFC_MUENCHEN.PNG",
+    "",
+    "/right /Small ${heute}.fmt(%d. %B %Y)",
+    "/Header2 Veranstaltungen des ADFC München im August",
+    "/comment \u2013 = mittellanger Bindestrich, Unicode en-dash, \u2014 = langer Bindestrich, Unicode em-dash",
+    "/Header3 /block Fahrrad-Technikkurse \u2013 Codierung \u2013 Tagestouren \u2013 Stammtische \u2013 Infoladen \u2013 Selbsthilfe-Werkstatt\n",
+    "",
+    "/Header4 Kurse zur Fahrradtechnik",
+    "/bold Termine:",
+    "/template /termin /selection=Technikkurse",
+      "/comment %A, %d. %B -> Montag, 6. August",
+      "/bold ${start}.fmt(%A, %d. %B) /body ${start}.fmt(%H:%M)-${end}.fmt(%H:%M) - /Tourtitel ${titel}",
+      "/comment /bold Kategorie: /body ${kategorie}",
+      "${beschreibung}",
+    "/endtemplate",
+    "",
+    "/bold Ort: /body ADFC München, Platenstr. 4",
+    "/bold Anmeldung: /body telefonisch unter 773429",
+    "/bold Teilnehmerzahl: /body maximal 8",
+    "/bold Teilnahmegebühren: /body 12,50€ (Rabatt für Studenten und ADFC-Mitglieder)",
+    "/bold Weitere Infos: /Link_yellow http://www.adfc-muenchen.de/veranstaltungen/kurse/technik",
+    "",
+    "/Header4 Fahrrad-Codierung zur Diebstahlprävention",
+    "/template /termin /selection=Codierung",
+      "/comment %A, %d. %B -> Montag, 6. August",
+      "/bold ${start}.fmt(%A, %d. %B), /body ${start}.fmt(%H:%M)-${end}.fmt(%H:%M)",
+      "/bold Ort: /body ${city}, ${street}",
+      "/comment /Tourtitel ${titel} /body /bold Kategorie: /body ${kategorie}",
+    "/endtemplate",
+    "",
+    "Terminreservierung notwendig",
+    "/block Bei der Fahrradcodierung wird ein persönlicher Code nach einem polizeilich anerkannten System generiert und in den Fahrradrahmen eingraviert. Über diesen Code kann der rechtmäßige Eigentümer aufgefundener Fahrräder ermittelt werden.",
+    "/bold Kosten: /body 15,00 € (für ADFC-Mitglieder 8,00 €)",
+    "/bold Weitere Infos: /Link_yellow http://www.adfc-muenchen.de/service/fahrradcodierung",
+    "",
+    "/Header4 Tagestouren (Auswahl)",
+    "/template /tour /selection=Touren",
+      "/Tourtitel ${titel} /body  (Tournummer ${nummer})",
+      "/comment %A, %d. %B, %H:%M Uhr -> Montag, 6. August, 16:00 Uhr",
+      "/bold Datum: /body ${start}.fmt(%A, %d. %B, %H:%M) Uhr, /bold Kategorie: /body ${kategorie}, /bold Schwierigkeit: /body ${schwierigkeit}, /bold Strecke: /body ${tourlänge}",
+      "${abfahrten}",
+      "${beschreibung}",
+      "${zusatzinfo}",
+      "${tourleiter}",
+    "/endtemplate",
+    "",
+    "/bold Teilnahmegebühren: /body 3-10 € (Rabatt für ADFC-Mitglieder)",
+    "Details und komplettes Angebot unter: /Link_yellow http://www.adfc-muenchen.de/radtouren/tagestouren",
+    "",
+    "/Header4 Öffentliche Arbeitsgruppen & Stammtisch",
+    "/template /termin /selection=Treffen",
+      "/Tourtitel ${titel}",
+      "/bold Termin: /body ${start}.fmt(%A, %d. %B, %H:%M) Uhr",
+      "/bold Ort: /body ${city}, ${street}, /bold Kategorie: /body ${kategorie}",
+      "${beschreibung}",
+      "${betreuer}",
+    "/endtemplate",
+    "",
+    "/Header4 Infoladen",
+    "Beratung zu allen Themen rund ums Radfahren. Zusätzlich finden Sie hier Karten und Radreiseführer.",
+    "/bold Termin: /body Jeden Donnerstag (außer Feiertage), 17-19:30 Uhr.",
+    "/bold Ort: /body ADFC München, Platenstr. 4",
+    "/bold Weitere Infos: /Link_yellow http://www.adfc-muenchen.de/infoladen",
+    "",
+    "/Header4 Selbsthilfe-Werkstatt",
+    "/bold Termin: /body Jeden Donnerstag (außer Feiertage), 17-19:30 Uhr.",
+    "/bold Ort: /body ADFC München, Platenstr. 4",
+    "/bold Gebühren: /body Werkstattbenutzung 8 € (ADFC-Mitglieder frei), mit Betreuung, Ersatzteile sind mitzubringen.",
+    "/bold Weitere Infos: /Link_yellow http://www.adfc-muenchen.de/selbsthilfewerkstatt",
+    "",
+    "ADFC Kreisverband München",
+    "Platenstr. 4, 80336 München",
+    "/Link_blue http://www.adfc-muenchen.de",
+    "Tel. 089 - 77 34 29",
+    "",
+    "Medienbetreuung: Martina Tollkühn",
+    "/Link_blue http://www.adfc-muenchen.de/presse",
+    "",
+    "/Link_blue mailto:presse@adfc-muenchen.de",
+    ""
+  ]
+}
