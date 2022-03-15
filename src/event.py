@@ -252,6 +252,14 @@ class Event(ABC):
         pass
 
     @abstractmethod
+    def getImageUrl(self):
+        pass
+
+    @abstractmethod
+    def getImageStream(self, imageUrl):
+        pass
+
+    @abstractmethod
     def getName(self):
         pass
 

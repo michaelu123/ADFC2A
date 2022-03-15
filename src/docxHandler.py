@@ -1,6 +1,7 @@
 # encoding: utf-8
-
+import base64
 import copy
+import io
 import os
 import re
 
@@ -8,7 +9,6 @@ import docx
 import expand
 import markdown
 import selektion
-import tourRest
 from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml.ns import qn
@@ -33,11 +33,13 @@ adfc_yellow = 0xee7c00  # CMYK=0 60 100 0
 def str2hex(s: str):
     return ":".join("{:04x}".format(ord(c)) for c in s)
 
+
 def delete_paragraph(paragraph):
     # https://github.com/python-openxml/python-docx/issues/33
     p = paragraph._element
     p.getparent().remove(p)
     p._p = p._element = None
+
 
 def delete_run(run):
     r = run._element
@@ -867,6 +869,12 @@ class DocxHandler(expand.Expand):
                     self.evalRun(run, event)
                     if rtext == "${titel}" and self.url is not None:
                         add_hyperlink_into_run(newp, run, self.runX, self.url)
+                        # newp.add_run().add_picture(io.BytesIO(base64.decodebytes(event.getImagePreview().encode())))
+                        try:
+                            image = event.getImageStream(event.getImageUrl())
+                            newp.add_run().add_picture(image, width=4000000.0)
+                        except Exception as e:
+                            logger.exception("cannot get image")
                 if newp.text == "":
                     delete_paragraph(newp)
 
@@ -888,9 +896,9 @@ class DocxHandler(expand.Expand):
                 move_run_before(self.runX, self.para)
                 delete_run(run)
             elif run.text == "${schwierigkeitH}":
-                    self.para.add_run(text=newtext, style="WD3_STYLE")
-                    move_run_before(self.runX, self.para)
-                    delete_run(run)
+                self.para.add_run(text=newtext, style="WD3_STYLE")
+                move_run_before(self.runX, self.para)
+                delete_run(run)
             else:
                 run.text = newtext  # assignment to run.text lets images disappear!?!?
 

@@ -267,13 +267,19 @@ class RestEvent(event.Event):
         return personen
 
     def getImagePreview(self):
-        return self.eventJS.get("imagePreview")
+        images = self.eventJS.get("images")
+        if len(images) > 0:
+            return images[0].get("preview")
 
     def getImageUrl(self):
         imageId = self.eventJS.get("eventItemImages")[0].get("imageId")
         return f"https://intern-touren-termine.adfc.de/api/images/{imageId}/download"
         #  Response header von /images/id/download:
         # Location: https://adfcrtp.blob.core.cloudapi.de/public-production/2b6a400f-d5ac-46bf-9133-b53ecd5a180c/bille-bei-billwerder.jpg
+        #           https://adfcrtp.blob.core.windows.net/public-production/ef0fb2d9-8f00-47c6-8bb4-8fa2124bd670/wittelsbacherschlossfriedberg.jpg
+
+    def getImageStream(self, imageUrl):
+        return self.eventServer.getImageStream(imageUrl)
 
     def getName(self):
         tourLoc = self.tourLocations[0]

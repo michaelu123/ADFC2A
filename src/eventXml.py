@@ -141,7 +141,7 @@ class XmlEvent(event.Event):
         if tl is not None:
             abfahrten.append(tl)
 
-        tls = self.eventItem.get("TourLocations")
+        tls = self.tourLocations
         if tls != "":
             tls = tls.get("ExportTourLocation")
             tls = self.makeList(tls)
@@ -362,6 +362,27 @@ class XmlEvent(event.Event):
         return personen
 
     def getImagePreview(self):
+        try:
+            evR = restServer.getEventById(self.getEventItemId(), self.getTitel())
+            return evR.getImagePreview()
+        except Exception as e:
+            logger.exception("cannot get image preview")
+            pass
+        return None
+
+
+    def getImageUrl(self):
+        imageUrls = self.eventItem.get("EventItemImages")
+        if imageUrls != "":
+            imageUrls = imageUrls.get("ExportEventItemImage")
+            imageUrls = self.makeList(imageUrls)
+            return imageUrls[0].get("DownloadLink")
+
+    def getImageStream(self, imageUrl):
+        try:
+            return restServer.getImageStream(imageUrl)
+        except Exception as e:
+            logger.log("cannot get image stream")
         return None
 
     def getName(self):
@@ -410,7 +431,6 @@ class EventServer:
         if len(items) == 0:
             return events
         for item in iter(items):
-            # item["imagePreview"] = ""  # save space
             titel = item.get("Title")
             if titel is None:
                 logger.error("Kein Titel für den Event %s", str(item))

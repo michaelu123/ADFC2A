@@ -58,7 +58,7 @@ def randomId(length):
 
 
 def expTitel(tour):
-    return tour.getTitel().replace("]]>","")
+    return tour.getTitel().replace("]]>", "")
 
 
 def expEventItemId(tour):
@@ -69,7 +69,7 @@ def expKurz(tour):
     kurz = "<p>" + tour.getKurzbeschreibung() + "<br>Kategorie: " + tour.getKategorie() + "<br>Geeignet für: " + \
            tour.getRadTyp() + "<br>" + "<br>".join(tour.getZusatzInfo()) + "<br>Schwierigkeitsgrad: " + \
            ["unbekannt", "sehr einfach", "einfach", "mittel", "schwer", "sehr schwer"][tour.getSchwierigkeit()] + "</p>"
-    kurz = kurz.replace("<br><br>", "<br>").replace("]]>","")
+    kurz = kurz.replace("<br><br>", "<br>").replace("]]>", "")
     return kurz
 
 
@@ -78,16 +78,16 @@ def expFrontendLink(tour):
 
 
 def expPublishDate(tour):
-    return tour.getPublishDate().replace("T", " ");
+    return tour.getPublishDate().replace("T", " ")
 
 
 def expDate(tour):
-    t = tour.getDatum();
-    return t[2][0:10] # YYY-MM-DD
+    t = tour.getDatum()
+    return t[2][0:10]  # YYY-MM-DD
 
 
 def expTime(tour):
-    t = tour.getDatum();
+    t = tour.getDatum()
     return t[1]
 
 
@@ -99,7 +99,7 @@ def expDuration(tour):
     e = e[0:19]  # '2018-04-29T07:30:00'
     e = datetime.strptime(e, "%Y-%m-%dT%H:%M:%S")
     d = e - b  # a timedelta!
-    d = d.total_seconds() / 60 # timedelta in minutes
+    d = d.total_seconds() / 60  # timedelta in minutes
     return str(int(d))
 
 
@@ -145,7 +145,7 @@ def expPricing(tour):
         ]
 
 
-def expCategories(tour):  # wir belassen es erstmal bei Category Radtouren
+def expCategories(_tour):  # wir belassen es erstmal bei Category Radtouren
     return ['        <Category id="36"/>\n']
 
 
@@ -153,6 +153,7 @@ def readPOIs():
     with open("locs.json", "r", encoding="utf-8") as jsonFile:
         pois = json.load(jsonFile)
         return pois
+
 
 class VADBHandler:
     def __init__(self, tourServerVar):
@@ -211,18 +212,18 @@ class VADBHandler:
         if self.expPoi(tour) == "6137":
             return
         with open(self.xmlFile, "r", encoding="utf-8") as input:
-            for l in input:
-                mp = paramRE.search(l, 0)
+            for line in input:
+                mp = paramRE.search(line, 0)
                 if mp is not None:
                     sp = mp.span()
-                    cmd = l[sp[0] + 2:sp[1] - 1]
-                    l = l[0:sp[0]] + self.expandCmd(tour, cmd) + l[sp[1]:]
-                    self.output.writelines([l]);
-                elif l.find("<Expand") > 0:
-                    ll = self.expandCmd(tour, l.strip())
-                    self.output.writelines(ll);
+                    cmd = line[sp[0] + 2:sp[1] - 1]
+                    line = line[0:sp[0]] + self.expandCmd(tour, cmd) + line[sp[1]:]
+                    self.output.writelines([line])
+                elif line.find("<Expand") > 0:
+                    ll = self.expandCmd(tour, line.strip())
+                    self.output.writelines(ll)
                 else:
-                    self.output.writelines([l]);
+                    self.output.writelines([line])
 
     def expCopyRight(self, tour):
         try:
@@ -233,7 +234,7 @@ class VADBHandler:
                 s = s.replace("\\", "")
                 x = s.find(':"')
                 y = s.find('"', x + 2)
-                return (s[x + 2:y]).replace("]]>","")
+                return (s[x + 2:y]).replace("]]>", "")
         except:
             return "ADFC"
 
@@ -254,9 +255,9 @@ class VADBHandler:
 
     def expPoi(self, tour):
         (tlat, tlon) = tour.getLatLon()
-        id = self.findNearestPoiId(tlat, tlon)
+        nid = self.findNearestPoiId(tlat, tlon)
         if id is not None:
-            return str(id)
+            return str(nid)
         ort = tour.getStartpunkt()
         self.unknownLocs[str(tlat) + "," + str(tlon)] = {
             "link": tour.getFrontendLink(),

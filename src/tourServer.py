@@ -8,6 +8,9 @@ import json
 import os
 import sys
 import ssl
+from io import BytesIO
+from urllib.request import urlopen
+from urllib.parse import urlparse
 
 import adfc_gliederungen
 import tourRest
@@ -88,7 +91,6 @@ class EventServer:
             if items is None or len(items) == 0:
                 continue
             for item in iter(items):
-                # item["imagePreview"] = ""  # save space
                 titel = item.get("title")
                 if titel is None:
                     logger.error("Kein Titel für den Event %s", str(item))
@@ -123,7 +125,6 @@ class EventServer:
         event = self.events.get(eventItemId)
         if event is not None:
             return event
-        imagePreview = eventJsSearch.get("imagePreview")
         escTitle = "".join([(ch if ch.isalnum() else "_") for ch in eventJsSearch.get("title")])
         jsonPath = self.tmpDir + "/" + eventItemId[0:6] + "_" + escTitle + ".json"
         if self.useRest or not os.path.exists(jsonPath):
@@ -134,8 +135,7 @@ class EventServer:
                 eventJS = json.load(resp)
             self.putConn(conn)
             eventJS["eventItemFiles"] = None  # save space
-            eventJS["images"] = []  # save space
-            eventJS["imagePreview"] = imagePreview
+            #eventJS["images"] = []  # save space
             # if not os.path.exists(jsonPath):
             with open(jsonPath, "w") as jsonFile:
                 json.dump(eventJS, jsonFile, indent=4)
@@ -153,8 +153,21 @@ class EventServer:
         return event
 
     def getEventById(self, eventItemId, titel):
-        ejs = {"eventItemId": eventItemId, "imagePreview": "", "title": titel}
+        ejs = {"eventItemId": eventItemId, "title": titel}
         return self.getEvent(ejs)
+
+    def getImageStream(self, imageUrl):
+        res = urlparse(imageUrl)
+        x = res.path.rindex("/")
+        imgPath = self.tmpDir + "/img_" + res.path[x+1:]
+        if self.useRest or not os.path.exists(imgPath):
+            barr = urlopen(imageUrl).read()
+            with open(imgPath, "wb") as imgFile:
+                imgFile.write(barr)
+        else:
+            with open(imgPath, "rb") as imgFile:
+                barr = imgFile.read()
+        return BytesIO(barr)
 
     @functools.lru_cache(100)
     def getUser(self, userId):
