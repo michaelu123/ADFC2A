@@ -338,7 +338,7 @@ class MyApp(Frame):
             title="XML File (XML export aus dem TP) auswählen",
             defaultextension=".xml", filetypes=[("XML", ".xml")])
         self.gliederungLB.disable()
-        self.gliederungSvar.set("")
+        self.gliederungSvar.set("< durch XML-Datei bestimmt >")
 
     def xmlFileClose(self, *args):
         self.xmlFileName = ""
@@ -434,11 +434,25 @@ class MyApp(Frame):
                                 text="Aktuelle Daten werden vom Server geholt",
                                 variable=self.useRestVar)
 
+
+        swFrame = Frame(master)
         self.includeSubVar = BooleanVar()
         self.includeSubVar.set(True)
-        includeSubCB = Checkbutton(master,
+        includeSubCB = Checkbutton(swFrame,
                                    text="Untergliederungen einbeziehen",
                                    variable=self.includeSubVar)
+
+        self.includeImgVar = BooleanVar()
+        self.includeImgVar.set(True)
+        includeImgCB = Checkbutton(swFrame,
+                                   text="Mit Bild",
+                                   variable=self.includeImgVar)
+        swFrame.grid_rowconfigure(0, weight=1)
+        swFrame.grid_columnconfigure(0, weight=1)
+        swFrame.grid_columnconfigure(1, weight=0)
+        includeSubCB.grid(row=0, column=0, sticky="nsew")
+        includeImgCB.grid(row=0, column=1, sticky="ns")
+
 
         if self.scribus:
             self.formatOM = LabelOM(master, "Ausgabeformat:",
@@ -449,7 +463,7 @@ class MyApp(Frame):
             if f == "Scribus":  # not outside scribus
                 f = "Text"
             self.formatOM = LabelOM(master, "Ausgabeformat:",
-                                    ["München", "Starnberg", "CSV", "Text", "Word", "PDF"],  # "PDF"
+                                    ["München", "Starnberg", "CSV", "Text", "Word"],  # "PDF"
                                     f, command=self.formatSelektor)
 
         self.linkTypeOM = LabelOM(master, "Links ins:",
@@ -535,7 +549,8 @@ class MyApp(Frame):
         for y in range(7):
             Grid.rowconfigure(master, y, weight=1 if y == 6 else 0)
         useRestCB.grid(row=0, column=0, padx=5, pady=2, sticky="w")
-        includeSubCB.grid(row=0, column=1, padx=5, pady=2, sticky="w")
+        swFrame.grid(row=0, column=1, padx=5, pady=2, sticky="w")
+        includeImgCB.grid(row=0, column=2, padx=5, pady=2, sticky="w")
         self.formatOM.grid(row=1, column=0, padx=5, pady=2, sticky="w")
         self.linkTypeOM.grid(row=1, column=1, padx=5, pady=2, sticky="w")
         eventTypesLF.grid(row=2, column=0, padx=5, pady=2, sticky="w")
@@ -570,7 +585,7 @@ class MyApp(Frame):
 
         if self.xmlFileName is not None and self.xmlFileName != "":
             self.gliederungLB.disable()
-            self.gliederungSvar.set("")
+            self.gliederungSvar.set("< durch XML-Datei bestimmt >")
 
     def disableStart(self):
         self.startBtn.config(state=DISABLED)
@@ -594,10 +609,16 @@ class MyApp(Frame):
         return self.eventTypeVar.get()
 
     def getGliederung(self):
-        return self.gliederungSvar.get()
+        g = self.gliederungSvar.get()
+        if g.startswith("<"):
+            g = ""
+        return g
 
     def getIncludeSub(self):
         return self.includeSubVar.get()
+
+    def getIncludeImg(self):
+        return self.includeImgVar.get()
 
     @staticmethod
     def checkDate(d):

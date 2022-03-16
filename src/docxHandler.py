@@ -555,6 +555,7 @@ class DocxHandler(expand.Expand):
         self.run = None
         self.ausgabedatei = None
         self.runX = 0
+        self.images = []
         self.selecter = selektion.Selektion()
         global debug
         try:
@@ -764,6 +765,7 @@ class DocxHandler(expand.Expand):
         self.includeSub = self.gui.getIncludeSub()
         self.start = self.gui.getStart()
         self.end = self.gui.getEnd()
+        self.images = []
         paragraphs = self.doc.paragraphs
         paraCnt = len(paragraphs)
         paraNo = 0
@@ -870,11 +872,13 @@ class DocxHandler(expand.Expand):
                     if rtext == "${titel}" and self.url is not None:
                         add_hyperlink_into_run(newp, run, self.runX, self.url)
                         # newp.add_run().add_picture(io.BytesIO(base64.decodebytes(event.getImagePreview().encode())))
-                        try:
-                            image = event.getImageStream(event.getImageUrl())
-                            newp.add_run().add_picture(image, width=4000000.0)
-                        except Exception as e:
-                            logger.exception("cannot get image")
+                        if self.gui.getIncludeImg():
+                            try:
+                                image = event.getImageStream(event.getImageUrl())
+                                self.images.append(image) # see adfc_gui.py
+                                newp.add_run().add_picture(image, width=4000000.0)
+                            except Exception as e:
+                                logger.exception("cannot get image")
                 if newp.text == "":
                     delete_paragraph(newp)
 
