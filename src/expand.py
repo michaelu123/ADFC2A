@@ -160,6 +160,24 @@ def expRadTypen(tour, _):
     typen = tour.getRadTypen()
     return ", ".join(typen)
 
+def expZusatzInfo(tour, _):
+    zi = tour.getZusatzInfo()
+    if len(zi) == 0:
+        return None
+    txt = ""
+    for z in zi:
+        txt += z + "\n"
+    return txt
+
+def expPreise(tour, _):
+    res = tour.getPrices()
+    if res is None:
+        return "Nicht angegeben"
+    (minp, maxp) = res
+    return "Mitglieder " + str(minp) + ", Nichtmitglieder " + str(maxp)
+
+def expAnmeldung(tour, _):
+    return tour.getAnmeldung()
 
 class Expand:
     def __init__(self):
@@ -183,13 +201,15 @@ class Expand:
             "tourlänge": expTourLength,
             "tourstufe": expTourStufe,
             "abfahrten": self.expAbfahrten,
-            "zusatzinfo": self.expZusatzInfo,
+            "zusatzinfo": expZusatzInfo,
             "höhenmeter": expHoehenMeter,
             "anstiege": expAnstiege,
             "character": expCharacter,
             "abfahrtenm": expAbfahrtenM,
             "tourleiterm": expTourLeiterM,
             "radtypen": expRadTypen,
+            "preise": expPreise,
+            "anmeldung": expAnmeldung,
             "seite": lambda e, f: "{:>2}".format(self.pageNr),  # 01-99
         }
 
@@ -233,8 +253,21 @@ class Expand:
             self.url = event.getBackendLink()
         else:
             self.url = None
+
+        titel = event.getTitel()
         logger.info("Titel: " + event.getTitel())
-        return event.getTitel()
+        state = event.getPublState()
+        if state == "Published":
+            return titel
+        if state == "Review":
+            mark = "Prüfung"
+        elif state == "Draft":
+            mark = "Entwurf"
+        elif state == "Cancelled":
+            mark = "Gestrichen"
+        else:
+            mark = state
+        return titel + " (" + mark + ")"
 
     def expBeschreibung(self, event, _):
         desc = event.getBeschreibung(False)
@@ -264,12 +297,3 @@ class Expand:
                 afl.append(af[0] + " " + af[1] + " " + af[2])
         # print("AB0:", self.runX, "<<" + self.para.runs[self.runX].text + ">>", " ".join(["<" + run.text + ">" for run in self.para.runs]))
         return "Ort" + ("" if len(afs) == 1 else "e") + ": " + ", ".join(afl)
-
-    def expZusatzInfo(self, tour, _):
-        zi = tour.getZusatzInfo()
-        if len(zi) == 0:
-            return None
-        txt = ""
-        for z in zi:
-            txt += z + "\n"
-        return txt

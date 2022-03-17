@@ -70,16 +70,29 @@ def selMerkmalEnthaeltNicht(event, lst):
     for merkmal in merkmale:
         for val in lst:
             if merkmal.find(val) >= 0:
-                logger.debug("event %s nicht nichtmerkmale %s in %s", event.getTitel(), merkmale, lst)
+                logger.debug("event %s enthält merkmale %s in %s", event.getTitel(), merkmale, lst)
                 return False
     return True
 
 
-def selIstEntwurf(event, _):
-    return event.istEntwurf()
+def selStatusEnthaelt(event, lst):
+    sta = event.getPublState()
+    for val in lst:
+        if sta == val:
+            return True
+    logger.debug("event %s nicht status %s in %s", event.getTitel(), sta, lst)
+    return False
 
-def selIstNichtEntwurf(event, _):
-    return not event.istEntwurf()
+
+def selStatusEnthaeltNicht(event, lst):
+    sta = event.getPublState()
+    for val in lst:
+        if sta == val:
+            logger.debug("event %s status %s in %s", event.getTitel(), sta, lst)
+            return False
+    return True
+
+
 
 
 
@@ -96,8 +109,8 @@ class Selektion:
             "kategorie": selKategorie,
             "merkmalenthält": selMerkmalEnthaelt,
             "merkmalenthältnicht": selMerkmalEnthaeltNicht,
-            "istentwurf": selIstEntwurf,
-            "istnichtentwurf": selIstNichtEntwurf
+            "statusenthält": selStatusEnthaelt,
+            "statusenthältnicht": selStatusEnthaeltNicht,
         }
 
     def selected(self, event, sel):

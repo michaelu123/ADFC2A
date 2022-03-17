@@ -443,7 +443,7 @@ class MyApp(Frame):
                                    variable=self.includeSubVar)
 
         self.includeImgVar = BooleanVar()
-        self.includeImgVar.set(True)
+        self.includeImgVar.set(False)
         includeImgCB = Checkbutton(swFrame,
                                    text="Mit Bild",
                                    variable=self.includeImgVar)

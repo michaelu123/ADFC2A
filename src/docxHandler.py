@@ -874,7 +874,7 @@ class DocxHandler(expand.Expand):
                         # newp.add_run().add_picture(io.BytesIO(base64.decodebytes(event.getImagePreview().encode())))
                         if self.gui.getIncludeImg():
                             try:
-                                image = event.getImageStream(event.getImageUrl())
+                                image = event.getImageStream(event.getImageUrl(), event.getEventItemId())
                                 self.images.append(image) # see adfc_gui.py
                                 newp.add_run().add_picture(image, width=4000000.0)
                             except Exception as e:

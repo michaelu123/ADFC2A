@@ -5,6 +5,7 @@ from myLogger import logger
 
 anstiege = ["flach", "einzelne Steigungen", "hügelig", "bergig"]
 
+
 class RestEvent(event.Event):
     def __init__(self, eventJS, eventJSSearch, eventServer):
         self.eventJS = eventJS
@@ -50,7 +51,8 @@ class RestEvent(event.Event):
             if typ != "Startpunkt" and typ != "Treffpunkt":
                 continue
             if not tourLoc.get("withoutTime"):
-                if len(abfahrten) == 0:  # for first loc, get starttime from eventItem, beginning in tourloc is often wrong
+                # for first loc, get starttime from eventItem, beginning in tourloc is often wrong
+                if len(abfahrten) == 0:
                     beginning = self.getDatum()[1]
                 else:
                     beginning = tourLoc.get("beginning")
@@ -94,7 +96,7 @@ class RestEvent(event.Event):
             city = tourLoc.get("city")
             latitude = tourLoc.get("latitude")
             longitude = tourLoc.get("longitude")
-            return (name, street, city, latitude, longitude)
+            return name, street, city, latitude, longitude
         return None
 
     def getBeschreibung(self, raw):
@@ -149,7 +151,8 @@ class RestEvent(event.Event):
         for itemTag in self.itemTags:
             tag = itemTag.get("tag")
             category = itemTag.get("category")
-            if category.startswith("Aktionen,") or category.startswith("Radlertreff") or category.startswith("Service") \
+            if category.startswith("Aktionen,") \
+                    or category.startswith("Radlertreff") or category.startswith("Service") \
                     or category.startswith("Versammlungen") or category.startswith("Vortr") \
                     or category.startswith("Typen "):
                 return tag
@@ -214,7 +217,7 @@ class RestEvent(event.Event):
 
     def getAnstiege(self):
         h = self.eventItem.get("cTourClimb")
-        if h >= 1 and h <= 4:
+        if 1 <= h <= 4:
             return anstiege[h-1]
         return "unbekannt"
 
@@ -274,12 +277,9 @@ class RestEvent(event.Event):
     def getImageUrl(self):
         imageId = self.eventJS.get("eventItemImages")[0].get("imageId")
         return f"https://intern-touren-termine.adfc.de/api/images/{imageId}/download"
-        #  Response header von /images/id/download:
-        # Location: https://adfcrtp.blob.core.cloudapi.de/public-production/2b6a400f-d5ac-46bf-9133-b53ecd5a180c/bille-bei-billwerder.jpg
-        #           https://adfcrtp.blob.core.windows.net/public-production/ef0fb2d9-8f00-47c6-8bb4-8fa2124bd670/wittelsbacherschlossfriedberg.jpg
 
-    def getImageStream(self, imageUrl):
-        return self.eventServer.getImageStream(imageUrl)
+    def getImageStream(self, imageUrl, itemId):
+        return self.eventServer.getImageStream(imageUrl, itemId)
 
     def getName(self):
         tourLoc = self.tourLocations[0]
@@ -295,26 +295,50 @@ class RestEvent(event.Event):
 
     def getLatLon(self):
         tourLoc = self.tourLocations[0]
-        return (tourLoc.get("latitude"), tourLoc.get("longitude"),)
-
+        return tourLoc.get("latitude"), tourLoc.get("longitude")
 
     def isExternalEvent(self):
         return self.eventItem.get("cExternalEvent") == "true"
 
-    def istEntwurf(self):
-        return False  # Rest gibt keine Entwürfe zurück
+    def getPublState(self):
+        return self.eventItem.get("cStatus")
 
     def getPrices(self):
         minPrice = 9999999.0
         maxPrice = 0.0
-        itemPrices = self.eventJS.get("eventItemPrices");
+        itemPrices = self.eventJS.get("eventItemPrices")
+        if itemPrices is None or len(itemPrices) == 0:
+            return None
         for itemPrice in itemPrices:
             price = itemPrice.get("price")
             if price < minPrice:
                 minPrice = price
             if price > maxPrice:
                 maxPrice = price
-        return (minPrice, maxPrice)
+        return minPrice, maxPrice
+
+    def getAnmeldung(self):
+        rtype = self.eventItem.get("cRegistrationType")
+        rurl = self.eventItem.get("cExternalRegistrationUrl")
+        rstart = self.eventItem.get("registrationStart")
+        max = self.eventItem.get("maximum")
+        closDate = self.eventItem.get("closingDate")
+        res = rtype
+        if rstart is not None and rstart != "":
+            rstart = event.convertToMEZOrMSZ(rstart)
+            res += ", ab " + rstart
+        res += ", max Teilnehmer: "
+        if max == 0:
+            res += "unbegrenzt"
+        else:
+            res += str(max)
+        if closDate is not None and closDate != "":
+            closDate = event.convertToMEZOrMSZ(closDate)
+            res += ", Anmeldeschluss: " + closDate
+        if rurl != "":
+            res += ", extUrl=" + rurl
+        return res
+
 
 class User:
     def __init__(self, userJS):
@@ -333,4 +357,3 @@ class User:
         if self.phone is not None and self.phone != "":
             name += " (" + self.phone + ")"
         return name
-

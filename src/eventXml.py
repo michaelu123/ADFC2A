@@ -1,12 +1,11 @@
 import time
-from concurrent.futures.thread import ThreadPoolExecutor
 from xml.dom.minidom import *
 import event
-import tourServer
 from myLogger import logger
 
 schwierList = ["unbekannt", "sehr einfach", "einfach", "mittel", "schwer", "sehr schwer"]
 restServer = None
+
 
 # from https://stackoverflow.com/questions/191536/converting-xml-to-json-using-python Paulo Vj
 def parse_element(element):
@@ -53,8 +52,9 @@ def elimText(d):
         pass
     return d
 
+
 # need to remove non-XML chars from XML
-class XMLFilter():
+class XMLFilter:
     def __init__(self, f):
         self.f = f
 
@@ -63,6 +63,7 @@ class XMLFilter():
         s = s.replace("&#x1", "§§§§")  # ????
         return s
 
+
 class XmlEvent(event.Event):
     def __init__(self, eventItem):
         self.eventItem = eventItem
@@ -70,12 +71,6 @@ class XmlEvent(event.Event):
         self.titel = self.eventItem.get("Title").strip()
         self.eventNummer = 0
         logger.info("eventItemId %s %s", self.titel, self.getEventItemId())
-
-    def getTitel(self):
-        if self.istEntwurf():
-            return self.titel + " (Entwurf)"
-        else:
-            return self.titel
 
     def getEventItemId(self):
         return self.eventItem.get("EventItemId")
@@ -102,38 +97,38 @@ class XmlEvent(event.Event):
         return e
 
     def tourLoc(self, tl):
-            if tl is None:
-                return None
-            typ = tl.get("Type")
-            if typ != "Startpunkt" and typ != "Treffpunkt" and typ != "Zielort":
-                return None
-            beginning = tl.get("Beginning")
-            logger.debug("beginning %s", beginning)  # '2018-04-24T12:00:00'
-            beginning = event.convertToMEZOrMSZ(beginning)  # '2018-04-24T14:00:00'
-            beginning = beginning[11:16]  # 14:00
-            name = tl.get("Name")
-            street = tl.get("Street")
-            city = tl.get("City")
-            logger.debug("name '%s' street '%s' city '%s'", name, street, city)
-            loc = name
-            if city != "":
-                if loc == "":
-                    loc = city
-                else:
-                    loc = loc + " " + city
-            if street != "":
-                if loc == "":
-                    loc = street
-                else:
-                    loc = loc + " " + street
-            if typ == "Startpunkt":
-                if self.isTermin():
-                    typ = "Treffpunkt"
-                else:
-                    typ = "Start"
-            if typ == "Zielort":
-                typ = "Ziel"
-            return (typ, beginning, loc)
+        if tl is None:
+            return None
+        typ = tl.get("Type")
+        if typ != "Startpunkt" and typ != "Treffpunkt" and typ != "Zielort":
+            return None
+        beginning = tl.get("Beginning")
+        logger.debug("beginning %s", beginning)  # '2018-04-24T12:00:00'
+        beginning = event.convertToMEZOrMSZ(beginning)  # '2018-04-24T14:00:00'
+        beginning = beginning[11:16]  # 14:00
+        name = tl.get("Name")
+        street = tl.get("Street")
+        city = tl.get("City")
+        logger.debug("name '%s' street '%s' city '%s'", name, street, city)
+        loc = name
+        if city != "":
+            if loc == "":
+                loc = city
+            else:
+                loc = loc + " " + city
+        if street != "":
+            if loc == "":
+                loc = street
+            else:
+                loc = loc + " " + street
+        if typ == "Startpunkt":
+            if self.isTermin():
+                typ = "Treffpunkt"
+            else:
+                typ = "Start"
+        if typ == "Zielort":
+            typ = "Ziel"
+        return (typ, beginning, loc)
 
     def getAbfahrten(self):
         abfahrten = []
@@ -274,15 +269,15 @@ class XmlEvent(event.Event):
 
         tag = self.eventItem.get("SpecialCharacteristic")
         if tag is not None and tag != "":
-            besonders = [ x.get("Tag") for x in self.makeList(tag.get("ExportTag"))]
+            besonders = [x.get("Tag") for x in self.makeList(tag.get("ExportTag"))]
 
         tag = self.eventItem.get("FurtherProperties")
         if tag is not None and tag != "":
-            weitere = [ x.get("Tag") for x in self.makeList(tag.get("ExportTag"))]
+            weitere = [x.get("Tag") for x in self.makeList(tag.get("ExportTag"))]
 
         tag = self.eventItem.get("SpecialTargetGroup")
         if tag is not None and tag != "":
-            zielgruppe = [ x.get("Tag") for x in self.makeList(tag.get("ExportTag"))]
+            zielgruppe = [x.get("Tag") for x in self.makeList(tag.get("ExportTag"))]
 
         zusatzinfo = []
         if len(besonders) > 0:
@@ -305,7 +300,7 @@ class XmlEvent(event.Event):
         return h
 
     def getAnstiege(self):
-        h = self.eventItem.get("CTourClimb") # flach, einzelne Anstiege, hügelig, bergig
+        h = self.eventItem.get("CTourClimb")  # flach, einzelne Anstiege, hügelig, bergig
         return h
 
     def getCharacter(self):
@@ -365,11 +360,19 @@ class XmlEvent(event.Event):
         try:
             evR = restServer.getEventById(self.getEventItemId(), self.getTitel())
             return evR.getImagePreview()
-        except Exception as e:
+        except Exception:
             logger.exception("cannot get image preview")
             pass
         return None
 
+    def getPublState(self):
+        try:
+            evR = restServer.getEventById(self.getEventItemId(), self.getTitel())
+            return evR.getPublState()
+        except Exception:
+            logger.exception("cannot get publication state")
+            pass
+        return None
 
     def getImageUrl(self):
         imageUrls = self.eventItem.get("EventItemImages")
@@ -378,10 +381,10 @@ class XmlEvent(event.Event):
             imageUrls = self.makeList(imageUrls)
             return imageUrls[0].get("DownloadLink")
 
-    def getImageStream(self, imageUrl):
+    def getImageStream(self, imageUrl, itemId):
         try:
-            return restServer.getImageStream(imageUrl)
-        except Exception as e:
+            return restServer.getImageStream(imageUrl, itemId)
+        except Exception:
             logger.log("cannot get image stream")
         return None
 
@@ -400,8 +403,41 @@ class XmlEvent(event.Event):
     def isExternalEvent(self):
         return self.eventItem.get("CExternalEvent") == "Ja"
 
-    def istEntwurf(self):
-        return self.eventItem.get("CPublishDate") == ""
+    def getPrices(self):
+        minPrice = 9999999.0
+        maxPrice = 0.0
+        itemPrices = self.eventItem.get("EventItemPrices")
+        if itemPrices is None or isinstance(itemPrices, str):
+            return None
+        itemPrices = itemPrices.get("ExportEventItemPrice")
+        if itemPrices is None or len(itemPrices) == 0:
+            return None
+        for itemPrice in itemPrices:
+            price = float(itemPrice.get("Price"))
+            if price < minPrice:
+                minPrice = price
+            if price > maxPrice:
+                maxPrice = price
+        return minPrice, maxPrice
+
+    def getAnmeldung(self):
+        rtype = self.eventItem.get("CRegistrationType")
+        rurl = self.eventItem.get("CExternalRegistrationUrl")
+        max = self.eventItem.get("Maximum")
+        closDate = self.eventItem.get("ClosingDate")
+        res = rtype
+        res += ", max Teilnehmer: "
+        if max == "0":
+            res += "unbegrenzt"
+        else:
+            res += max
+        if closDate is not None and closDate != "":
+            closDate = event.convertToMEZOrMSZ(closDate)
+            res += ", Anmeldeschluss: " + closDate
+        if rurl != "":
+            res += ", extUrl=" + rurl
+        return res
+
 
 class EventServer:
     def __init__(self, fn, rs):
@@ -414,7 +450,7 @@ class EventServer:
 
     def getEvents(self, unitKey, start, end, typ):
         unit = "Alles" if unitKey is None or unitKey == "" else unitKey
-        startYear = start[0:4]
+        # startYear = start[0:4]
 
         with open(self.fn, "r", encoding="utf-8") as f:
             f = XMLFilter(f)
@@ -464,7 +500,7 @@ class EventServer:
     def getEvent(self, ev):
         return ev
 
-    def getEventById(self, eventItemId, titel):
+    def getEventById(self, eventItemId, _titel):
         return self.events[eventItemId]
 
     def calcNummern(self):

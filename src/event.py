@@ -256,7 +256,7 @@ class Event(ABC):
         pass
 
     @abstractmethod
-    def getImageStream(self, imageUrl):
+    def getImageStream(self, imageUrl, itemId):
         pass
 
     @abstractmethod
@@ -276,5 +276,17 @@ class Event(ABC):
         pass
 
     @abstractmethod
-    def istEntwurf(self):
+    def getPublState(self):
         pass
+
+    @abstractmethod
+    def getPrices(self):
+        pass
+
+    @abstractmethod
+    def getAnmeldung(self):
+        pass
+
+    def getTitel(self):
+        return self.titel
+

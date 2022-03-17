@@ -156,10 +156,10 @@ class EventServer:
         ejs = {"eventItemId": eventItemId, "title": titel}
         return self.getEvent(ejs)
 
-    def getImageStream(self, imageUrl):
+    def getImageStream(self, imageUrl, itemId):
         res = urlparse(imageUrl)
         x = res.path.rindex("/")
-        imgPath = self.tmpDir + "/img_" + res.path[x+1:]
+        imgPath = self.tmpDir + "/img_" + itemId[0:6] + "_" + res.path[x+1:]
         if self.useRest or not os.path.exists(imgPath):
             barr = urlopen(imageUrl).read()
             with open(imgPath, "wb") as imgFile:
