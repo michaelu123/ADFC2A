@@ -334,7 +334,8 @@ class RestEvent(event.Event):
             res += str(max)
         if closDate is not None and closDate != "":
             closDate = event.convertToMEZOrMSZ(closDate)
-            res += ", Anmeldeschluss: " + closDate
+            closDate = closDate[8:10] + "." + closDate[5:7] + "." + closDate[0:4] + " " + closDate[11:16]
+            res += ", Anmeldeschluss: " + closDate + " (" + self.getDatum()[0][4:9] + ")"
         if rurl != "":
             res += ", extUrl=" + rurl
         return res
