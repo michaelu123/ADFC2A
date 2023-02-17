@@ -135,8 +135,11 @@ def expLongitude(tour):
 
 
 def expPricing(tour):
-    (minPrice, maxPrice) = tour.getPrices()
-    if maxPrice == 0.0:
+    maxPrice = 0.0
+    prices = tour.getPrices()
+    if prices is not None:
+        (minPrice, maxPrice) = prices
+    if prices is None or maxPrice == 0.0:
         return ["           <freeOfCharge>true</freeOfCharge>\n"]
     else:
         return [
