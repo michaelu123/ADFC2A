@@ -6,6 +6,7 @@ from myLogger import logger
 anstiege = ["flach", "einzelne Steigungen", "hügelig", "bergig"]
 
 
+
 class RestEvent(event.Event):
     def __init__(self, eventJS, eventJSSearch, eventServer):
         self.eventJS = eventJS
@@ -339,6 +340,22 @@ class RestEvent(event.Event):
         if rurl != "":
             res += ", extUrl=" + rurl
         return res
+
+    def getOrganizer(self):
+        organizer = self.eventItem.get("cOrganizingUserId")
+        if organizer is not None and len(organizer) > 0:
+            org = self.eventServer.getUser(organizer)
+            if org is not None:
+                return org.firstName + " " + org.lastName
+        return "?"
+
+    def getOrganizer2(self):
+        organizer2 = self.eventItem.get("cSecondOrganizingUserId")
+        if organizer2 is not None and len(organizer2) > 0:
+            org = self.eventServer.getUser(organizer2)
+            if org is not None:
+                return org.firstName + " " + org.lastName
+        return "?"
 
 
 class User:

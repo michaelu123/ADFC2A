@@ -24,12 +24,12 @@ import rawHandler
 import textHandler
 # textHandler produziert output a la KV München
 import tourServer
+
 try:
     from PIL import ImageTk
 except:
     pass
 from myLogger import logger, logFilePath
-
 
 def toDate(dmy):  # 21.09.2018
     d = dmy[0:2]
@@ -100,7 +100,8 @@ class Prefs:
                 self.docxTemplateName = prefJS.get("docxtemplatename", "")
                 self.xmlFileName = prefJS.get("xmlfilename", "")
                 self.isDefault = False
-        except:
+        except Exception as e:
+            print(e)
             pass
 
     def save(self):
@@ -147,7 +148,6 @@ class Prefs:
 
     def getXmlFileName(self):
         return self.xmlFileName
-
 
 
 class LabelEntry(Frame):
@@ -434,7 +434,6 @@ class MyApp(Frame):
                                 text="Aktuelle Daten werden vom Server geholt",
                                 variable=self.useRestVar)
 
-
         swFrame = Frame(master)
         self.includeSubVar = BooleanVar()
         self.includeSubVar.set(True)
@@ -452,7 +451,6 @@ class MyApp(Frame):
         swFrame.grid_columnconfigure(1, weight=0)
         includeSubCB.grid(row=0, column=0, sticky="nsew")
         includeImgCB.grid(row=0, column=1, sticky="ns")
-
 
         if self.scribus:
             self.formatOM = LabelOM(master, "Ausgabeformat:",
@@ -501,7 +499,6 @@ class MyApp(Frame):
             radTypRB.grid(sticky="w")
         self.docxTemplateName = self.prefs.getDocxTemplateName()
         self.xmlFileName = self.prefs.getXmlFileName()
-
 
         # container for LV selector and Listbox for KVs
         glContainer = Frame(master, borderwidth=2, relief="sunken", width=100)
@@ -702,7 +699,7 @@ class MyApp(Frame):
                 if useXml:
                     events.sort(key=lambda x: x.getDatumRaw())  # sortieren nach Datum, REST: beginning, XML: beginning
                 else:
-                    events.sort(key=lambda x: x["beginning"]) # sortieren nach Datum, REST: beginning, XML: beginning
+                    events.sort(key=lambda x: x["beginning"])  # sortieren nach Datum, REST: beginning, XML: beginning
                 ThreadPoolExecutor(max_workers=self.max_workers).map(self.eventServer.getEvent, events)
                 for event in events:
                     event = self.eventServer.getEvent(event)

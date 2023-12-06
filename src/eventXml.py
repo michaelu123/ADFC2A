@@ -440,6 +440,13 @@ class XmlEvent(event.Event):
         return res
 
 
+    def getOrganizer(self):
+        return self.eventItem.get("Organizer", "-")
+
+    def getOrganizer2(self):
+        return self.eventItem.get("Organizer2", "-")
+
+
 class EventServer:
     def __init__(self, fn, rs):
         global restServer

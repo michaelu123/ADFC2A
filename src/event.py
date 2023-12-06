@@ -1,6 +1,8 @@
 import re
 import time
 import xml.sax
+import os
+import json
 from abc import ABC, abstractmethod
 
 from myLogger import logger
@@ -10,26 +12,66 @@ character = ["", "durchgehend Asphalt", "fester Belag", "unebener Untergrund", "
 span1RE = r'<span.*?>'
 span2RE = r'</span>'
 
+sommerzeiten = None
+sommerzeitenDefault = {
+    "2020": {
+        "begSZ": "2020-03-29",
+        "endSZ": "2020-10-25"
+    },
+    "2021": {
+        "begSZ": "2021-03-28",
+        "endSZ": "2021-10-31"
+    },
+    "2022": {
+        "begSZ": "2022-03-27",
+        "endSZ": "2022-10-30"
+    },
+    "2023": {
+        "begSZ": "2023-03-26",
+        "endSZ": "2023-10-29"
+    },
+    "2024": {
+        "begSZ": "2024-03-31",
+        "endSZ": "2024-10-27"
+    },
+    "2025": {
+        "begSZ": "2024-03-30",
+        "endSZ": "2024-10-26"
+    },
+    "2026": {
+        "begSZ": "2024-03-29",
+        "endSZ": "2024-10-25"
+    }
+}
+
+def loadSZ():
+    szPath = "c:/temp/tpjson/sommerzeiten.json"
+    global sommerzeiten
+    if not os.path.exists(szPath):
+        with open(szPath, "w") as jsonFileSz:
+            json.dump(sommerzeitenDefault, jsonFileSz, indent=4)
+    with open(szPath, "r") as jsonFileSz:
+        sommerzeiten = json.load(jsonFileSz)
+
+
 # see https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime-with-python
 def convertToMEZOrMSZ(beginning):  # '2018-04-29T06:30:00+00:00'
     # scribus/Python2 does not support %z
     beginning = beginning[0:19]  # '2018-04-29T06:30:00'
     d = time.strptime(beginning, "%Y-%m-%dT%H:%M:%S")
     oldDay = d.tm_yday
-    if beginning.startswith("2020"):
-        begSZ = "2020-03-29"
-        endSZ = "2020-10-25"
-    elif beginning.startswith("2021"):
-        begSZ = "2021-03-28"
-        endSZ = "2021-10-31"
-    elif beginning.startswith("2022"):
-        begSZ = "2022-03-27"
-        endSZ = "2022-10-30"
-    elif beginning.startswith("2023"):
-        begSZ = "2023-03-26"
-        endSZ = "2023-10-29"
-    else:
-        raise ValueError("year " + beginning + " not configured")
+    year = beginning[0:4]
+    if sommerzeiten is None:
+        loadSZ()
+    begSZ = None
+    endSZ = None
+    try:
+        begSZ = sommerzeiten[year]["begSZ"]
+        endSZ = sommerzeiten[year]["endSZ"]
+    except:
+        pass
+    if begSZ is None or endSZ is None:
+        raise ValueError("year " + beginning + " not configured in c:/temp/tpjson/sommerzeiten.json")
     sz = begSZ <= beginning < endSZ
     epochGmt = time.mktime(d)
     epochMez = epochGmt + ((2 if sz else 1) * 3600)

@@ -179,6 +179,11 @@ def expPreise(tour, _):
 def expAnmeldung(tour, _):
     return tour.getAnmeldung()
 
+def expOrganizer(tour, _):
+    return tour.getOrganizer()
+def expOrganizer2(tour, _):
+    return tour.getOrganizer2()
+
 class Expand:
     def __init__(self):
         self.expFunctions = {  # keys in lower case
@@ -210,6 +215,8 @@ class Expand:
             "radtypen": expRadTypen,
             "preise": expPreise,
             "anmeldung": expAnmeldung,
+            "organizer": expOrganizer,
+            "organizer2": expOrganizer2,
             "seite": lambda e, f: "{:>2}".format(self.pageNr),  # 01-99
         }
 
